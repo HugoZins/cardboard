@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useFavorites } from "../context/FavoritesContext";
+import { useFavorites } from "../hooks/useFavorites";
 import GameCard from "../components/GameCard";
 import { useNavigate } from "react-router-dom";
 import { Download, Heart, Trash2 } from "lucide-react";

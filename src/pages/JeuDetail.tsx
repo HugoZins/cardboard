@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useFavorites } from "../context/FavoritesContext";
+import { useFavorites } from "../hooks/useFavorites";
 import jeux from "../data/jeux.json";
 import { ArrowLeft, Heart, ExternalLink } from "lucide-react";
 import GameCard from "../components/GameCard";

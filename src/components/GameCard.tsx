@@ -1,19 +1,9 @@
 import { Heart } from "lucide-react";
-import { useFavorites } from "../context/FavoritesContext";
+import { useFavorites } from "../hooks/useFavorites";
 import { useState } from "react";
 
-type Game = {
-  id: number;
-  title: string;
-  image: string;
-  minPlayers: number;
-  maxPlayers: number;
-  minDuration: number;
-  maxDuration: number;
-  age: number;
-  complexity: number;
-  price: number;
-};
+// On importe directement le type Game depuis le contexte (c’est le même que dans jeux.json)
+import type { Game } from "../context/FavoritesContext";
 
 type Props = {
   game: Game;
@@ -44,7 +34,7 @@ export default function GameCard({
     if (onRemoveFromFavorites) {
       onRemoveFromFavorites();
     } else {
-      toggleFavorite(game);
+      toggleFavorite(game); // Maintenant accepté grâce au nouveau type du contexte
     }
   };
 

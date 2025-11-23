@@ -1,6 +1,6 @@
-import { Home, Search, Heart, Info } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
-import { useFavorites } from "../context/FavoritesContext";
+import { Home, Search, Heart } from "lucide-react";
+import { useFavorites } from "../hooks/useFavorites";
 
 export default function Layout() {
   const { favorites } = useFavorites();
@@ -8,82 +8,72 @@ export default function Layout() {
   const navItems = [
     { to: "/", icon: Home, label: "Accueil" },
     { to: "/recherche", icon: Search, label: "Recherche" },
-    {
-      to: "/favoris",
-      icon: Heart,
-      label: "Favoris",
-      badge: favorites.length,
-    },
+    { to: "/favoris", icon: Heart, label: "Favoris", badge: favorites.length },
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="bg-indigo-600 text-white shadow-lg sticky top-0 z-50">
-        <nav className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <NavLink to="/" className="flex items-center gap-3 group -ml-2">
-              <h1 className="text-2xl md:text-3xl font-bold tracking-tight group-hover:scale-105 transition-transform">
-                Cardboard
-              </h1>
-            </NavLink>
+    <>
+      <header className="bg-white shadow-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <NavLink to="/" className="text-2xl font-bold text-indigo-600">
+            Cardboard
+          </NavLink>
 
-            <div className="hidden md:flex items-center gap-8">
-              {navItems.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  className={({ isActive }) =>
-                    `flex items-center gap-2 px-5 py-2.5 rounded-lg transition-all font-medium ${
-                      isActive
-                        ? "bg-white text-indigo-600 shadow-md"
-                        : "hover:bg-indigo-700"
-                    }`
-                  }
-                >
-                  <item.icon className="w-5 h-5" />
-                  <span>{item.label}</span>
-                  {item.badge > 0 && (
-                    <span className="ml-2 bg-red-500 text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center">
-                      {item.badge}
-                    </span>
-                  )}
-                </NavLink>
-              ))}
-            </div>
+          <nav className="hidden md:flex items-center gap-8">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  `flex items-center gap-2 px-4 py-2 rounded-lg transition ${
+                    isActive
+                      ? "bg-indigo-100 text-indigo-700 font-medium"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`
+                }
+              >
+                <item.icon className="w-5 h-5" />
+                <span>{item.label}</span>
+                {/* Badge sécurisé */}
+                {item.badge != null && item.badge > 0 && (
+                  <span className="ml-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
+                    {item.badge}
+                  </span>
+                )}
+              </NavLink>
+            ))}
+          </nav>
+        </div>
 
-            <div className="flex md:hidden items-center justify-center gap-8 flex-1">
-              {navItems.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  className={({ isActive }) =>
-                    `flex items-center gap-2 px-4 py-2 rounded-lg transition-all text-sm ${
-                      isActive
-                        ? "bg-white text-indigo-600 font-bold"
-                        : "hover:bg-indigo-700"
-                    }`
-                  }
-                >
-                  <item.icon className="w-5 h-5" />
-                  {item.badge > 0 && (
-                    <span className="ml-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">
-                      {item.badge}
-                    </span>
-                  )}
-                </NavLink>
-              ))}
-            </div>
+        {/* Navigation mobile */}
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
+          <div className="flex justify-around py-2">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  `flex flex-col items-center gap-1 px-4 py-3 rounded-lg transition ${
+                    isActive ? "text-indigo-600" : "text-gray-500"
+                  }`
+                }
+              >
+                <item.icon className="w-6 h-6" />
+                <span className="text-xs">{item.label}</span>
+                {item.badge != null && item.badge > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {item.badge}
+                  </span>
+                )}
+              </NavLink>
+            ))}
           </div>
         </nav>
       </header>
 
-      <main className="flex-1 bg-gray-50">
+      <main className="pb-20 md:pb-8">
         <Outlet />
       </main>
-
-      <footer className="bg-gray-800 text-white py-6 text-center">
-        <p>© 2025 - Cardboard</p>
-      </footer>
-    </div>
+    </>
   );
 }

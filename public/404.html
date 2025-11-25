@@ -1,19 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>CardBoard – Redirection…</title>
+    <script>
+      const pathname = location.pathname;
 
-<head>
-  <meta charset="utf-8">
-  <title>CardBoard – Redirection…</title>
-  <script>
-    // GitHub Pages charge cette page quand une route n'existe pas
-    // On recharge proprement l'app React avec le bon chemin
-    const path = location.pathname + location.search + location.hash;
-    location.replace("/cardboard/" + path.replace(/^\/+/, ""));
-  </script>
-</head>
+      let cleanPath = pathname.replace(/^\/cardboard\/+/g, "/");
 
-<body>
-  <p>Redirection en cours…</p>
-</body>
+      if (cleanPath === "/" || cleanPath === "") {
+        cleanPath = "/cardboard/";
+      } else if (!cleanPath.startsWith("/cardboard/")) {
+        cleanPath = "/cardboard" + cleanPath;
+      }
 
+      const newUrl = location.origin + cleanPath + location.search + location.hash;
+
+      location.replace(newUrl);
+    </script>
+  </head>
+  <body>
+    Redirection…
+  </body>
 </html>

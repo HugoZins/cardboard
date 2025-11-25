@@ -1,25 +1,24 @@
 <!DOCTYPE html>
-<html lang="fr">
-  <head>
-    <meta charset="utf-8" />
-    <title>CardBoard – Redirection…</title>
-    <script>
-      const pathname = location.pathname;
+<html>
 
-      let cleanPath = pathname.replace(/^\/cardboard\/+/g, "/");
+<head>
+  <meta charset="utf-8">
+  <title>CardBoard</title>
+  <script>
+    const requested = location.pathname + location.search + location.hash;
 
-      if (cleanPath === "/" || cleanPath === "") {
-        cleanPath = "/cardboard/";
-      } else if (!cleanPath.startsWith("/cardboard/")) {
-        cleanPath = "/cardboard" + cleanPath;
-      }
+    const correctPrefix = "/cardboard/";
 
-      const newUrl = location.origin + cleanPath + location.search + location.hash;
+    if (requested.startsWith(correctPrefix)) {
+      location.replace(location.origin + correctPrefix + "index.html" + location.search + location.hash);
+    } else {
+      location.replace(location.origin + correctPrefix + requested.replace(/^\//, ""));
+    }
+  </script>
+</head>
 
-      location.replace(newUrl);
-    </script>
-  </head>
-  <body>
-    Redirection…
-  </body>
+<body>
+  Redirection…
+</body>
+
 </html>

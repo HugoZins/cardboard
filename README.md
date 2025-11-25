@@ -1,73 +1,62 @@
-# React + TypeScript + Vite
+# CardBoard — Catalogue de jeux de société
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Projet réalisé dans le cadre du TP UX/UI Design – Master 1**  
+Recherche, filtrage et découverte de jeux de société pour un public non expert.
 
-Currently, two official plugins are available:
+Live demo : https://hugozins.github.io/cardboard/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Contexte du projet
 
-## React Compiler
+Ce site répond à un énoncé de cours centré sur **l’expérience utilisateur** autour d’un catalogue de données structurées.  
+Objectif : permettre à un **utilisateur lambda** (famille, étudiant, joueur occasionnel) de trouver rapidement le jeu de société idéal selon ses contraintes (nombre de joueurs, durée, âge, budget…).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Dataset : 25 jeux de société réels avec données riches (durée, joueurs, complexité, catégories, thèmes, prix, popularité…).
 
-## Expanding the ESLint configuration
+## Fonctionnalités implémentées
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Recherche textuelle intelligente avec **fuzzy matching** (tolère les fautes d’orthographe)
+- **Suggestions intelligentes** quand aucun résultat exact → évite la frustration
+- Filtres puissants : durée, nombre de joueurs, âge, complexité, prix, catégories
+- Tri multiple : popularité, prix, durée
+- Système de **favoris** persistant (localStorage)
+- Mode sombre complet avec transitions fluides
+- Design responsive (mobile-first)
+- Navigation fluide avec React Router
+- Fiches détaillées riches + badge complexité + jeux similaires
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Technologies utilisées
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- React 18 + TypeScript
+- Vite (build ultra-rapide)
+- Tailwind CSS
+- React Router v6
+- Lucide React (icônes)
+- localStorage pour les favoris
+- Hébergement : GitHub Pages
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Points UX forts
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- Aucune page blanche grâce aux suggestions intelligentes
+- Filtres progressifs avec compteurs en temps réel
+- Interface claire et épurée (inspirée BoardGameGeek / Philibert)
+- Mode sombre soigné (transitions, images adaptées)
+- Accessibilité & performance optimisées
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Installation & lancement local
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+```bash
+git clone https://github.com/HugoZins/cardboard.git
+cd cardboard
+npm install
+npm run dev
+→ Ouvre http://localhost:5173
+
+Déploiement
+Le site est automatiquement déployé sur GitHub Pages à chaque push sur main
+Base path géré automatiquement (/ en local → /cardboard/ en prod)
+
+Auteur
+Hugo Zins — Master 1
+
+Projet validé dans le cadre du cours UX/UI Design (recherche, filtrage, data)
+“Trouver le bon jeu de société n’a jamais été aussi simple.”

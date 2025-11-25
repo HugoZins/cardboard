@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import GameCard from "../components/GameCard";
 import jeux from "../data/jeux.json";
@@ -8,7 +8,7 @@ export default function Recherche() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
-  // Filtres actifs
+  // Filtres
   const [selectedDuration, setSelectedDuration] = useState<string | null>(null);
   const [selectedComplexityLevel, setSelectedComplexityLevel] = useState<
     "light" | "medium" | "expert" | null
@@ -31,9 +31,55 @@ export default function Recherche() {
 
   const navigate = useNavigate();
 
-  // ──────────────────────────────────────
-  // Données statiques
-  // ──────────────────────────────────────
+  const fuzzyMatch = (text: string, search: string): boolean => {
+    if (!search) return true;
+    const cleanText = text
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+    const cleanSearch = search
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+    if (cleanText.includes(cleanSearch)) return true;
+    const noDup = cleanSearch.replace(/(.)\1+/g, "$1");
+    if (cleanText.includes(noDup)) return true;
+    if (
+      noDup.length >= 4 &&
+      noDup.split("").every((l) => cleanText.includes(l))
+    )
+      return true;
+
+    if (cleanSearch.length >= 5) {
+      let errors = 0,
+        i = 0,
+        j = 0;
+      while (i < cleanSearch.length && j < cleanText.length) {
+        if (cleanSearch[i] === cleanText[j]) {
+          i++;
+          j++;
+        } else {
+          errors++;
+          if (errors > 2) return false;
+          if (i < cleanSearch.length - 1 && cleanSearch[i + 1] === cleanText[j])
+            i++;
+          else if (
+            j < cleanText.length - 1 &&
+            cleanSearch[i] === cleanText[j + 1]
+          )
+            j++;
+          else {
+            i++;
+            j++;
+          }
+        }
+      }
+      return i >= cleanSearch.length || errors <= 2;
+    }
+    return false;
+  };
+
   const durationRanges = useMemo(
     () => [
       { id: "short", label: "< 30 min", min: 0, max: 29 },
@@ -93,9 +139,6 @@ export default function Recherche() {
     return Array.from(cats).sort();
   }, []);
 
-  // ──────────────────────────────────────
-  // Fonctions utilitaires
-  // ──────────────────────────────────────
   const matchesPlayerRange = (
     game: (typeof jeux)[0],
     rangeId: string | null
@@ -120,9 +163,6 @@ export default function Recherche() {
     return gameAge >= range.min && gameAge <= range.max;
   };
 
-  // ──────────────────────────────────────
-  // Fonction magique : calcule les jeux filtrés en ignorant un filtre spécifique
-  // ──────────────────────────────────────
   const getFilteredGamesIgnoring = useMemo(() => {
     return (
       ignoreFilter:
@@ -137,13 +177,9 @@ export default function Recherche() {
       return jeux.filter((game) => {
         const matchesSearch =
           !searchTerm ||
-          game.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          game.categories.some((c) =>
-            c.toLowerCase().includes(searchTerm.toLowerCase())
-          ) ||
-          game.themes.some((t) =>
-            t.toLowerCase().includes(searchTerm.toLowerCase())
-          );
+          fuzzyMatch(game.title, searchTerm) ||
+          game.categories.some((c) => fuzzyMatch(c, searchTerm)) ||
+          game.themes.some((t) => fuzzyMatch(t, searchTerm));
 
         const matchesDuration =
           ignoreFilter === "duration" ||
@@ -168,22 +204,24 @@ export default function Recherche() {
         const matchesPrice =
           ignoreFilter === "price" ||
           !selectedPriceRange ||
-          priceRanges.some(
-            (r) =>
-              r.id === selectedPriceRange &&
-              (r.min
-                ? game.price >= r.min && game.price <= r.max
-                : game.price <= r.max)
-          );
+          (() => {
+            const range = priceRanges.find((r) => r.id === selectedPriceRange);
+            if (!range) return true;
+            if (range.min !== undefined)
+              return game.price >= range.min && game.price <= range.max;
+            return game.price <= range.max;
+          })();
 
         const matchesPlayers =
           ignoreFilter === "players" ||
           !selectedPlayerRange ||
           matchesPlayerRange(game, selectedPlayerRange);
+
         const matchesAge =
           ignoreFilter === "age" ||
           !selectedAgeRange ||
           matchesAgeRange(game.age, selectedAgeRange);
+
         const matchesCategories =
           ignoreFilter === "categories" ||
           selectedCategories.length === 0 ||
@@ -210,24 +248,18 @@ export default function Recherche() {
     selectedCategories,
   ]);
 
-  // Base filtrée réelle (avec tous les filtres actifs)
   const filteredGames = useMemo(
     () => getFilteredGamesIgnoring(null),
     [getFilteredGamesIgnoring]
   );
 
-  // ──────────────────────────────────────
-  // Compteurs intelligents : chaque option voit les autres filtres actifs, mais pas elle-même
-  // ──────────────────────────────────────
   const durationCounts = useMemo(() => {
     const games = getFilteredGamesIgnoring("duration");
     const counts: Record<string, number> = {};
-    durationRanges.forEach((r) => (counts[r.id] = 0));
-    games.forEach((game) => {
-      const range = durationRanges.find(
-        (r) => game.maxDuration >= r.min && game.maxDuration <= r.max
-      );
-      if (range) counts[range.id]++;
+    durationRanges.forEach((r) => {
+      counts[r.id] = games.filter(
+        (g) => g.maxDuration >= r.min && g.maxDuration <= r.max
+      ).length;
     });
     return counts;
   }, [getFilteredGamesIgnoring]);
@@ -235,12 +267,10 @@ export default function Recherche() {
   const complexityCounts = useMemo(() => {
     const games = getFilteredGamesIgnoring("complexity");
     const counts: Record<string, number> = {};
-    complexityLevels.forEach((l) => (counts[l.id] = 0));
-    games.forEach((game) => {
-      const level = complexityLevels.find(
-        (l) => game.complexity >= l.min && game.complexity <= l.max
-      );
-      if (level) counts[level.id]++;
+    complexityLevels.forEach((l) => {
+      counts[l.id] = games.filter(
+        (g) => g.complexity >= l.min && g.complexity <= l.max
+      ).length;
     });
     return counts;
   }, [getFilteredGamesIgnoring]);
@@ -248,12 +278,11 @@ export default function Recherche() {
   const priceRangeCounts = useMemo(() => {
     const games = getFilteredGamesIgnoring("price");
     const counts: Record<string, number> = {};
-    priceRanges.forEach((r) => (counts[r.id] = 0));
-    games.forEach((game) => {
-      const range = priceRanges.find((r) =>
-        r.min ? game.price >= r.min && game.price <= r.max : game.price <= r.max
-      );
-      if (range) counts[range.id]++;
+    priceRanges.forEach((r) => {
+      counts[r.id] = games.filter((g) => {
+        if (r.min !== undefined) return g.price >= r.min && g.price <= r.max;
+        return g.price <= r.max;
+      }).length;
     });
     return counts;
   }, [getFilteredGamesIgnoring]);
@@ -261,11 +290,8 @@ export default function Recherche() {
   const playerRangeCounts = useMemo(() => {
     const games = getFilteredGamesIgnoring("players");
     const counts: Record<string, number> = {};
-    playerRanges.forEach((r) => (counts[r.id] = 0));
-    games.forEach((game) => {
-      playerRanges.forEach((r) => {
-        if (matchesPlayerRange(game, r.id)) counts[r.id]++;
-      });
+    playerRanges.forEach((r) => {
+      counts[r.id] = games.filter((g) => matchesPlayerRange(g, r.id)).length;
     });
     return counts;
   }, [getFilteredGamesIgnoring]);
@@ -273,11 +299,8 @@ export default function Recherche() {
   const ageRangeCounts = useMemo(() => {
     const games = getFilteredGamesIgnoring("age");
     const counts: Record<string, number> = {};
-    ageRanges.forEach((r) => (counts[r.id] = 0));
-    games.forEach((game) => {
-      ageRanges.forEach((r) => {
-        if (matchesAgeRange(game.age, r.id)) counts[r.id]++;
-      });
+    ageRanges.forEach((r) => {
+      counts[r.id] = games.filter((g) => matchesAgeRange(g.age, r.id)).length;
     });
     return counts;
   }, [getFilteredGamesIgnoring]);
@@ -294,32 +317,114 @@ export default function Recherche() {
     return counts;
   }, [getFilteredGamesIgnoring]);
 
-  // ──────────────────────────────────────
-  // Résultats triés
-  // ──────────────────────────────────────
+  const getSmartSuggestions = useCallback(() => {
+    let candidates: typeof jeux = [];
+
+    if (searchTerm) {
+      candidates = jeux
+        .filter(
+          (g) =>
+            fuzzyMatch(g.title, searchTerm) ||
+            g.categories.some((c) => fuzzyMatch(c, searchTerm)) ||
+            g.themes.some((t) => fuzzyMatch(t, searchTerm))
+        )
+        .sort(
+          (a, b) =>
+            (fuzzyMatch(b.title, searchTerm) ? 1 : 0) -
+            (fuzzyMatch(a.title, searchTerm) ? 1 : 0)
+        );
+      if (candidates.length >= 8) return candidates.slice(0, 8);
+    }
+
+    const relaxOrder = [
+      "categories",
+      "duration",
+      "complexity",
+      "players",
+      "age",
+      "price",
+    ] as const;
+
+    for (const filter of relaxOrder) {
+      const active =
+        (filter === "categories" && selectedCategories.length > 0) ||
+        (filter === "duration" && selectedDuration) ||
+        (filter === "complexity" && selectedComplexityLevel) ||
+        (filter === "price" && selectedPriceRange) ||
+        (filter === "players" && selectedPlayerRange) ||
+        (filter === "age" && selectedAgeRange);
+
+      if (!active) continue;
+
+      const relaxed = getFilteredGamesIgnoring(filter);
+      const newOnes = relaxed.filter(
+        (g) => !candidates.some((c) => c.id === g.id)
+      );
+      candidates.push(...newOnes);
+      if (candidates.length >= 12) break;
+    }
+
+    const scored = candidates.map((game) => {
+      let score = game.popularity / 10;
+      if (searchTerm && fuzzyMatch(game.title, searchTerm)) score += 150;
+      if (selectedCategories.length > 0) {
+        score +=
+          game.categories.filter((c) => selectedCategories.includes(c)).length *
+          40;
+      }
+      return { game, score };
+    });
+
+    const result = scored.sort((a, b) => b.score - a.score).map((i) => i.game);
+
+    if (result.length < 8) {
+      const needed = 8 - result.length;
+      result.push(
+        ...jeux
+          .filter((g) => !result.some((r) => r.id === g.id))
+          .sort((a, b) => b.popularity - a.popularity)
+          .slice(0, needed)
+      );
+    }
+    return result.slice(0, 8);
+  }, [
+    searchTerm,
+    selectedCategories,
+    selectedDuration,
+    selectedComplexityLevel,
+    selectedPriceRange,
+    selectedPlayerRange,
+    selectedAgeRange,
+    getFilteredGamesIgnoring,
+  ]);
+
   const filteredAndSortedGames = useMemo(() => {
     const sorted = [...filteredGames];
     sorted.sort((a, b) => {
       if (sortPopularity) {
-        const diff = b.popularity - a.popularity;
-        if (diff !== 0) return sortPopularity === "desc" ? diff : -diff;
+        const diff =
+          sortPopularity === "desc"
+            ? b.popularity - a.popularity
+            : a.popularity - b.popularity;
+        if (diff !== 0) return diff;
       }
       if (sortPrice) {
-        const diff = a.price - b.price;
-        if (diff !== 0) return sortPrice === "asc" ? diff : -diff;
+        const diff =
+          sortPrice === "asc" ? a.price - b.price : b.price - a.price;
+        if (diff !== 0) return diff;
       }
       if (sortDuration) {
-        const diff = a.minDuration - b.minDuration;
-        if (diff !== 0) return sortDuration === "asc" ? diff : -diff;
+        const diff =
+          sortDuration === "asc"
+            ? a.minDuration - b.minDuration
+            : b.minDuration - a.minDuration;
+        if (diff !== 0) return diff;
       }
       return 0;
     });
     return sorted;
   }, [filteredGames, sortPopularity, sortPrice, sortDuration]);
 
-  // ──────────────────────────────────────
-  // Handlers
-  // ──────────────────────────────────────
   const toggleCategory = (cat: string) => {
     setSelectedCategories((prev) =>
       prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
@@ -342,27 +447,25 @@ export default function Recherche() {
     setSortDuration(null);
   };
 
-  // ──────────────────────────────────────
-  // Rendu complet
-  // ──────────────────────────────────────
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow-sm sticky top-0 z-40">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 transition-colors duration-300">
+      {/* Barre de recherche */}
+      <div className="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-6 h-6" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 w-6 h-6" />
               <input
                 type="text"
-                placeholder="Rechercher un jeu, catégorie, thème..."
+                placeholder="Rechercher un jeu, catégorie, thème... (même mal orthographié !)"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-14 pr-6 py-4 text-lg border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full pl-14 pr-6 py-4 text-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all"
               />
             </div>
             <button
               onClick={() => setIsFiltersOpen(true)}
-              className="lg:hidden flex items-center gap-3 px-6 py-4 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition shadow-lg"
+              className="lg:hidden flex items-center gap-3 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full transition shadow-lg"
             >
               <Filter className="w-5 h-5" />
               <span>Filtres</span>
@@ -375,7 +478,7 @@ export default function Recherche() {
         <div className="flex gap-8">
           {/* Sidebar filtres */}
           <aside
-            className={`fixed inset-0 z-50 w-80 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out lg:relative lg:inset-auto lg:z-auto lg:shadow-lg lg:rounded-xl lg:block lg:w-80 ${
+            className={`fixed inset-0 z-50 w-80 bg-white dark:bg-gray-800 shadow-2xl transform transition-transform duration-300 ease-in-out lg:relative lg:inset-auto lg:z-auto lg:shadow-lg lg:rounded-xl lg:block lg:w-80 border-r border-gray-200 dark:border-gray-700 ${
               isFiltersOpen
                 ? "translate-x-0"
                 : "-translate-x-full lg:translate-x-0"
@@ -383,19 +486,21 @@ export default function Recherche() {
           >
             <div className="p-6 h-full overflow-y-auto lg:max-h-[calc(100vh-10rem)] lg:sticky lg:top-24">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold">Filtres</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  Filtres
+                </h2>
                 <button
                   onClick={() => setIsFiltersOpen(false)}
-                  className="lg:hidden p-2 hover:bg-gray-100 rounded-full"
+                  className="lg:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-6 h-6 text-gray-600 dark:text-gray-400" />
                 </button>
               </div>
 
               <div className="space-y-8">
                 {/* Durée */}
                 <div>
-                  <h3 className="font-semibold mb-4 text-lg">
+                  <h3 className="font-semibold mb-4 text-lg text-gray-900 dark:text-white">
                     Durée de partie
                   </h3>
                   <div className="grid grid-cols-2 gap-3">
@@ -409,14 +514,14 @@ export default function Recherche() {
                         }
                         className={`px-4 py-3 rounded-lg border-2 text-sm font-medium transition-all ${
                           selectedDuration === range.id
-                            ? "border-indigo-600 bg-indigo-50 text-indigo-700"
-                            : "border-gray-300 hover:border-gray-400"
+                            ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300"
+                            : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 bg-white dark:bg-gray-700"
                         }`}
                       >
                         <div>{range.label}</div>
                         <div className="text-xs opacity-70 mt-1">
                           {durationCounts[range.id] || 0} jeu
-                          {durationCounts[range.id] > 1 ? "x" : ""}
+                          {(durationCounts[range.id] || 0) > 1 ? "x" : ""}
                         </div>
                       </button>
                     ))}
@@ -425,7 +530,9 @@ export default function Recherche() {
 
                 {/* Complexité */}
                 <div>
-                  <h3 className="font-semibold mb-4 text-lg">Complexité</h3>
+                  <h3 className="font-semibold mb-4 text-lg text-gray-900 dark:text-white">
+                    Complexité
+                  </h3>
                   <div className="grid grid-cols-3 gap-3">
                     {complexityLevels.map((level) => {
                       const isSelected = selectedComplexityLevel === level.id;
@@ -443,17 +550,17 @@ export default function Recherche() {
                               isSelected ? null : (level.id as any)
                             )
                           }
-                          className={`relative px-4 py-3 rounded-full text-sm font-bold text-white shadow-lg transition-all transform hover:scale-105 ${
+                          className={`relative px-4 py-3 rounded-full text-sm font-bold text-white shadow-lg transition-all transform hover:scale-105 ${bg} ${
                             isSelected
-                              ? "ring-4 ring-indigo-400 ring-offset-2"
+                              ? "ring-4 ring-indigo-400 ring-offset-2 dark:ring-offset-gray-800"
                               : "opacity-90"
-                          } ${bg}`}
+                          }`}
                         >
                           <div className="text-center">
                             <div>{level.label}</div>
                             <div className="text-xs font-normal opacity-90 mt-0.5">
                               {complexityCounts[level.id] || 0} jeu
-                              {complexityCounts[level.id] > 1 ? "x" : ""}
+                              {(complexityCounts[level.id] || 0) > 1 ? "x" : ""}
                             </div>
                           </div>
                         </button>
@@ -464,7 +571,9 @@ export default function Recherche() {
 
                 {/* Prix */}
                 <div>
-                  <h3 className="font-semibold mb-4 text-lg">Prix</h3>
+                  <h3 className="font-semibold mb-4 text-lg text-gray-900 dark:text-white">
+                    Prix
+                  </h3>
                   <div className="grid grid-cols-2 gap-3">
                     {priceRanges.map((range) => (
                       <button
@@ -476,23 +585,23 @@ export default function Recherche() {
                         }
                         className={`px-4 py-3 rounded-lg border-2 text-sm font-medium transition-all ${
                           selectedPriceRange === range.id
-                            ? "border-indigo-600 bg-indigo-50 text-indigo-700"
-                            : "border-gray-300 hover:border-gray-400"
+                            ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300"
+                            : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 bg-white dark:bg-gray-700"
                         }`}
                       >
                         <div>{range.label}</div>
                         <div className="text-xs opacity-70 mt-1">
                           {priceRangeCounts[range.id] || 0} jeu
-                          {priceRangeCounts[range.id] > 1 ? "x" : ""}
+                          {(priceRangeCounts[range.id] || 0) > 1 ? "x" : ""}
                         </div>
                       </button>
                     ))}
                   </div>
                 </div>
 
-                {/* Nombre de joueurs */}
+                {/* Joueurs */}
                 <div>
-                  <h3 className="font-semibold mb-4 text-lg">
+                  <h3 className="font-semibold mb-4 text-lg text-gray-900 dark:text-white">
                     Nombre de joueurs
                   </h3>
                   <div className="grid grid-cols-2 gap-3">
@@ -506,23 +615,25 @@ export default function Recherche() {
                         }
                         className={`px-4 py-3 rounded-lg border-2 text-sm font-medium transition-all ${
                           selectedPlayerRange === range.id
-                            ? "border-indigo-600 bg-indigo-50 text-indigo-700"
-                            : "border-gray-300 hover:border-gray-400"
+                            ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300"
+                            : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 bg-white dark:bg-gray-700"
                         }`}
                       >
                         <div>{range.label}</div>
                         <div className="text-xs opacity-70 mt-1">
                           {playerRangeCounts[range.id] || 0} jeu
-                          {playerRangeCounts[range.id] > 1 ? "x" : ""}
+                          {(playerRangeCounts[range.id] || 0) > 1 ? "x" : ""}
                         </div>
                       </button>
                     ))}
                   </div>
                 </div>
 
-                {/* Âge recommandé */}
+                {/* Âge */}
                 <div>
-                  <h3 className="font-semibold mb-4 text-lg">Âge recommandé</h3>
+                  <h3 className="font-semibold mb-4 text-lg text-gray-900 dark:text-white">
+                    Âge recommandé
+                  </h3>
                   <div className="space-y-3">
                     {ageRanges.map((range) => (
                       <button
@@ -534,15 +645,15 @@ export default function Recherche() {
                         }
                         className={`w-full px-4 py-3 rounded-lg border-2 text-left text-sm font-medium transition-all ${
                           selectedAgeRange === range.id
-                            ? "border-indigo-600 bg-indigo-50 text-indigo-700"
-                            : "border-gray-300 hover:border-gray-400"
+                            ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300"
+                            : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 bg-white dark:bg-gray-700"
                         }`}
                       >
                         <div className="flex justify-between items-center">
                           <span>{range.label}</span>
                           <span className="text-xs opacity-70">
                             {ageRangeCounts[range.id] || 0} jeu
-                            {ageRangeCounts[range.id] > 1 ? "x" : ""}
+                            {(ageRangeCounts[range.id] || 0) > 1 ? "x" : ""}
                           </span>
                         </div>
                       </button>
@@ -552,21 +663,25 @@ export default function Recherche() {
 
                 {/* Catégories */}
                 <div>
-                  <h3 className="font-semibold mb-4 text-lg">Catégories</h3>
+                  <h3 className="font-semibold mb-4 text-lg text-gray-900 dark:text-white">
+                    Catégories
+                  </h3>
                   <div className="space-y-2 max-h-96 overflow-y-auto">
                     {allCategories.map((cat) => (
                       <label
                         key={cat}
-                        className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 px-3 py-2 rounded-lg transition"
+                        className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 px-3 py-2 rounded-lg transition"
                       >
                         <input
                           type="checkbox"
                           checked={selectedCategories.includes(cat)}
                           onChange={() => toggleCategory(cat)}
-                          className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
+                          className="w-5 h-5 text-indigo-600 dark:text-indigo-400 rounded focus:ring-indigo-500 dark:focus:ring-indigo-400"
                         />
-                        <span className="flex-1 text-gray-700">{cat}</span>
-                        <span className="text-sm text-gray-500">
+                        <span className="flex-1 text-gray-800 dark:text-gray-200">
+                          {cat}
+                        </span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
                           ({categoryCounts[cat] || 0})
                         </span>
                       </label>
@@ -576,7 +691,7 @@ export default function Recherche() {
 
                 <button
                   onClick={resetFilters}
-                  className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium"
+                  className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition font-medium"
                 >
                   Réinitialiser tous les filtres
                 </button>
@@ -596,12 +711,13 @@ export default function Recherche() {
           <div className="flex-1">
             <div className="mb-8">
               <div className="flex flex-wrap items-center justify-between gap-4">
-                <p className="text-lg text-gray-700">
+                <p className="text-lg text-gray-700 dark:text-gray-300">
                   {filteredAndSortedGames.length} jeu
                   {filteredAndSortedGames.length > 1 ? "x" : ""} trouvé
                   {filteredAndSortedGames.length > 1 ? "s" : ""}
                 </p>
                 <div className="flex flex-wrap items-center gap-3">
+                  {/* Tri Popularité */}
                   <button
                     onClick={() =>
                       setSortPopularity((p) =>
@@ -611,17 +727,19 @@ export default function Recherche() {
                     className={`px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 transition ${
                       sortPopularity
                         ? "bg-indigo-600 text-white"
-                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                        : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
                     }`}
                   >
                     Popularité{" "}
                     {sortPopularity === "desc" && (
                       <ChevronDown className="w-4 h-4" />
-                    )}{" "}
+                    )}
                     {sortPopularity === "asc" && (
                       <ChevronUp className="w-4 h-4" />
                     )}
                   </button>
+
+                  {/* Tri Prix */}
                   <button
                     onClick={() =>
                       setSortPrice((p) =>
@@ -631,15 +749,17 @@ export default function Recherche() {
                     className={`px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 transition ${
                       sortPrice
                         ? "bg-indigo-600 text-white"
-                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                        : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
                     }`}
                   >
                     Prix{" "}
                     {sortPrice === "desc" && (
                       <ChevronDown className="w-4 h-4" />
-                    )}{" "}
+                    )}
                     {sortPrice === "asc" && <ChevronUp className="w-4 h-4" />}
                   </button>
+
+                  {/* Tri Durée */}
                   <button
                     onClick={() =>
                       setSortDuration((p) =>
@@ -649,21 +769,22 @@ export default function Recherche() {
                     className={`px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 transition ${
                       sortDuration
                         ? "bg-indigo-600 text-white"
-                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                        : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
                     }`}
                   >
                     Durée{" "}
                     {sortDuration === "desc" && (
                       <ChevronDown className="w-4 h-4" />
-                    )}{" "}
+                    )}
                     {sortDuration === "asc" && (
                       <ChevronUp className="w-4 h-4" />
                     )}
                   </button>
+
                   {(sortPopularity !== "desc" || sortPrice || sortDuration) && (
                     <button
                       onClick={resetSort}
-                      className="text-sm text-gray-500 hover:text-gray-700 underline"
+                      className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 underline"
                     >
                       Réinitialiser le tri
                     </button>
@@ -672,17 +793,33 @@ export default function Recherche() {
               </div>
             </div>
 
+            {/* Résultats ou suggestions */}
             {filteredAndSortedGames.length === 0 ? (
               <div className="text-center py-20">
-                <p className="text-2xl text-gray-500 mb-4">
-                  Aucun jeu ne correspond à vos critères
+                <p className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-4">
+                  Aucun résultat exact… mais on a deviné ce que vous cherchiez !
                 </p>
-                <button
-                  onClick={resetFilters}
-                  className="text-indigo-600 hover:underline text-lg"
-                >
-                  Réinitialiser tous les filtres
-                </button>
+                <p className="text-xl text-gray-600 dark:text-gray-400 mb-12 max-w-3xl mx-auto">
+                  Voici les jeux les plus proches :
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                  {getSmartSuggestions().map((game) => (
+                    <div key={game.id} className="relative group">
+                      <GameCard
+                        game={game}
+                        onClick={() => navigate(`/jeu/${game.id}`)}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-12">
+                  <button
+                    onClick={resetFilters}
+                    className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition font-medium text-lg"
+                  >
+                    Réinitialiser tous les filtres
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">

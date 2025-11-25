@@ -46,14 +46,14 @@
     "complexity": 2,
     "price": 39,
     "popularity": 95,
-    "image": "https://cdn3.philibertnet.com/797512-thickbox_default/catane.jpg",
+    "image": "https://shop.asmodee.fr/product/image/large/koscat01fr_box3d_210618.png",
     "categories": ["Négociation", "Placement", "Ressources"],
     "themes": ["Médiéval"],
     "tags": ["Commerce", "Dé"]
   },
   {
     "id": 3,
-    "title": "Ticket to Ride",
+    "title": "Les Aventuriers du Rail",
     "shortDescription": "Jeu de connexion de villes par des lignes de train colorées : les joueurs collectent des cartes wagon et posent des segments de voies pour réaliser des objectifs de destination secrets.",
     "whyWeLoveIt": [
       "Règles expliquées en 3 minutes",
@@ -72,7 +72,7 @@
     "complexity": 2,
     "price": 45,
     "popularity": 97,
-    "image": "https://upload.wikimedia.org/wikipedia/en/thumb/9/92/Ticket_to_Ride_Board_Game_Box_EN.jpg/310px-Ticket_to_Ride_Board_Game_Box_EN.jpg",
+    "image": "https://www.all4play.fr/wp-content/uploads/2024/11/AVE01_000.png",
     "categories": ["Parcours", "Collection"],
     "themes": ["Train"],
     "tags": ["Famille", "Accessible"]
@@ -98,7 +98,7 @@
     "complexity": 3,
     "price": 38,
     "popularity": 96,
-    "image": "https://cdn3.philibertnet.com/523831-thickbox_default/pandemie.jpg",
+    "image": "https://cdn11.bigcommerce.com/s-9im8f1/images/stencil/1280x1280/products/1637/2468/zm7101_box_front_520px__55949.1587844188.png?c=2",
     "categories": ["Coopératif", "Gestion"],
     "themes": ["Contemporain"],
     "tags": ["Tension", "Sauver le monde"]
@@ -150,7 +150,7 @@
     "complexity": 3,
     "price": 55,
     "popularity": 99,
-    "image": "https://m.media-amazon.com/images/I/61+m0HYftaL._AC_UF1000,1000_QL80_.jpg",
+    "image": "https://stonemaiergames.com/wp-content/uploads/2023/11/3d-wingspan.png",
     "categories": ["Moteur", "Collection"],
     "themes": ["Nature", "Oiseaux"],
     "tags": ["Solo", "Magnifique"]
@@ -176,7 +176,7 @@
     "complexity": 2,
     "price": 32,
     "popularity": 93,
-    "image": "https://m.media-amazon.com/images/I/81yApa3EAjL._AC_UF1000,1000_QL80_.jpg",
+    "image": "https://shop.asmodee.fr/product/image/large/scspl01fr_box3dbis_20240517.png",
     "categories": ["Moteur", "Collection"],
     "themes": ["Renaissance"],
     "tags": ["Rapide", "Épuré"]
@@ -202,7 +202,7 @@
     "complexity": 2,
     "price": 34,
     "popularity": 92,
-    "image": "https://www.espritjeu.com/upload/image/carcassonne-p-image-80430-grande.jpg",
+    "image": "https://cdn.svc.asmodee.net/production-zman/uploads/image-converter/2024/08/ZM7810_box-right.webp",
     "categories": ["Placement", "Tuiles"],
     "themes": ["Médiéval"],
     "tags": ["Familial", "Accessible"]
@@ -228,7 +228,7 @@
     "complexity": 1,
     "price": 30,
     "popularity": 91,
-    "image": "https://cdn3.philibertnet.com/509638-thickbox_default/dixit.jpg",
+    "image": "https://cdn.svc.asmodee.net/production-asmodeeca/uploads/2022/01/ML-DIXIT-L-1024x1024.png",
     "categories": ["Ambiance", "Créativité"],
     "themes": ["Onirique"],
     "tags": ["Party", "Imagination"]
@@ -254,7 +254,7 @@
     "complexity": 5,
     "price": 130,
     "popularity": 100,
-    "image": "https://www.declicludik.fr/7242-full_default/gloomhaven.jpg",
+    "image": "https://arcadia-jeux.com/674-home_featured_product_default/gloomhaven.jpg",
     "categories": ["Coopératif", "Legacy", "Aventure"],
     "themes": ["Fantasy"],
     "tags": ["Expert", "Campagne"]
@@ -280,7 +280,7 @@
     "complexity": 5,
     "price": 79,
     "popularity": 97,
-    "image": "https://cdn2.philibertnet.com/607528-thickbox_default/spirit-island.jpg",
+    "image": "https://cf.geekdo-images.com/nd20Srmhp4OFM6uTxoWU6A__opengraph/img/U7_lorPj_Zi4Hom0dl17Rl1oJ_Q=/fit-in/1200x630/filters:strip_icc()/pic7036179.png",
     "categories": ["Coopératif", "Stratégie"],
     "themes": ["Nature", "Mythologie"],
     "tags": ["Expert", "Asymétrique"]
@@ -306,7 +306,7 @@
     "complexity": 2,
     "price": 45,
     "popularity": 94,
-    "image": "https://www.espritjeu.com/upload/image/les-aventuriers-du-rail---europe-p-image-75984-grande.jpg",
+    "image": "../../public/les_aventuriers_du_rail.png",
     "categories": ["Parcours", "Collection"],
     "themes": ["Train", "Europe"],
     "tags": ["Familial"]
@@ -332,7 +332,7 @@
     "complexity": 2,
     "price": 32,
     "popularity": 89,
-    "image": "https://cdn3.philibertnet.com/502859-thickbox_default/unlock-legendary-adventures.jpg",
+    "image": "https://cdn.svc.asmodee.net/production-asmodeeca/uploads/image-converter/2022/01/EN-UNLOCK-LEGENDARY_ADVENTURES-L.webp",
     "categories": ["Escape", "Coopératif"],
     "themes": ["Aventure"],
     "tags": ["Éphémère", "Application"]
@@ -358,7 +358,7 @@
     "complexity": 1,
     "price": 20,
     "popularity": 90,
-    "image": "https://blueorangegames.eu/wp-content/uploads/2017/04/Kingdomino-Box.jpg",
+    "image": "https://lepetitcaribou.ch/wp-content/uploads/2019/08/Kingdomino_001_PetitCaribou-copie.png",
     "categories": ["Placement", "Tuiles"],
     "themes": ["Médiéval"],
     "tags": ["Rapide", "Familial"]
@@ -384,7 +384,7 @@
     "complexity": 4,
     "price": 75,
     "popularity": 98,
-    "image": "https://www.ludum.fr/29047-large_default/scythe.jpg",
+    "image": "https://stonemaiergames.com/wp-content/uploads/2018/12/3d-scythe.png?w=640",
     "categories": ["Stratégie", "4X"],
     "themes": ["Steampunk", "1920+"],
     "tags": ["Magnifique", "Solo"]
@@ -410,7 +410,7 @@
     "complexity": 1,
     "price": 18,
     "popularity": 95,
-    "image": "https://cdn2.philibertnet.com/785640-thickbox_default/codenames-vf.jpg",
+    "image": "https://www.le-passe-temps.com/47068-medium_default/codenames.jpg",
     "categories": ["Ambiance", "Déduction"],
     "themes": ["Espionnage"],
     "tags": ["Party", "Rapide"]
@@ -436,7 +436,7 @@
     "complexity": 3,
     "price": 65,
     "popularity": 96,
-    "image": "https://cdn1.philibertnet.com/644050-thickbox_default/everdell-edition-essentielle.jpg",
+    "image": "https://ipa-gameshop.com/3586-large_default/everdell-essentials.jpg",
     "categories": ["Moteur", "Placement ouvrier"],
     "themes": ["Animaux", "Forêt"],
     "tags": ["Magnifique", "Solo"]
@@ -462,7 +462,7 @@
     "complexity": 4,
     "price": 65,
     "popularity": 93,
-    "image": "https://www.ludum.fr/1987-home_default/brass-lancashire.jpg",
+    "image": "https://www.all4play.fr/wp-content/uploads/2025/04/51ec44d0dcc56fceca93275b33a2e2e64046a9c3.png",
     "categories": ["Économie", "Stratégie"],
     "themes": ["Industriel"],
     "tags": ["Expert"]
@@ -488,7 +488,7 @@
     "complexity": 1,
     "price": 12,
     "popularity": 88,
-    "image": "https://www.ludum.fr/31887-large_default/love-letter.jpg",
+    "image": "https://www.ludum.fr/31888-large_default/love-letter.jpg",
     "categories": ["Déduction", "Bluff"],
     "themes": ["Médiéval"],
     "tags": ["Microgame", "Rapide"]
@@ -514,7 +514,7 @@
     "complexity": 4,
     "price": 55,
     "popularity": 95,
-    "image": "https://cdn3.philibertnet.com/461277-thickbox_default/paladins-du-royaume-de-l-ouest.jpg",
+    "image": "https://www.goupiya.com/9107-large_default/paladins-du-royaume-de-l-ouest.jpg",
     "categories": ["Placement ouvrier", "Moteur"],
     "themes": ["Médiéval"],
     "tags": ["Solo", "Expert"]
@@ -540,7 +540,7 @@
     "complexity": 2,
     "price": 35,
     "popularity": 89,
-    "image": "https://cdn3.philibertnet.com/510437-thickbox_default/takenoko.jpg",
+    "image": "https://studiobombyx.com/assets/TAKENOKO_3Dbox_ML-1.png",
     "categories": ["Placement", "Objectifs"],
     "themes": ["Japon", "Animaux"],
     "tags": ["Familial", "Mignon"]
@@ -592,7 +592,7 @@
     "complexity": 4,
     "price": 65,
     "popularity": 98,
-    "image": "https://cdn3.philibertnet.com/753952-thickbox_default/terraforming-mars.jpg",
+    "image": "https://fryxgames.se/wp-content/uploads/2023/08/TM.png",
     "categories": ["Moteur", "Science"],
     "themes": ["Sci-fi", "Mars"],
     "tags": ["Expert", "Solo"]
@@ -618,7 +618,7 @@
     "complexity": 2,
     "price": 25,
     "popularity": 85,
-    "image": "https://products.hasbro.com/_next/image?url=https%3A%2F%2Fwww.hasbro.com%2Fcommon%2Fproductimages%2Ffr_CH%2F583FB230960B494AA31338CDF7C1ED79%2Fc3297510441976dce53d57e2ce329801f7fb246b.jpg&w=1080&q=75",
+    "image": "https://lepetitcaribou.ch/wp-content/uploads/2024/01/Cluedo_001_PetitCaribou.png",
     "categories": ["Déduction", "Bluff"],
     "themes": ["Enquête"],
     "tags": ["Classique", "Familial"]
@@ -644,7 +644,7 @@
     "complexity": 1,
     "price": 20,
     "popularity": 87,
-    "image": "https://www.espritjeu.com/upload/image/exploding-kittens-p-image-99645-grande.jpg",
+    "image": "https://shop.asmodee.fr/product/image/large/ekiek01fr_box3d_20220804.png",
     "categories": ["Ambiance", "Humour"],
     "themes": ["Chats", "Absurde"],
     "tags": ["Party", "Rapide"]

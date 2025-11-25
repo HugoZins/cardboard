@@ -1,8 +1,6 @@
 import { Heart } from "lucide-react";
 import { useFavorites } from "../hooks/useFavorites";
 import { useState } from "react";
-
-// On importe directement le type Game depuis le contexte (c’est le même que dans jeux.json)
 import type { Game } from "../context/FavoritesContext";
 
 type Props = {
@@ -30,22 +28,21 @@ export default function GameCard({
 
   const handleHeartClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-
     if (onRemoveFromFavorites) {
       onRemoveFromFavorites();
     } else {
-      toggleFavorite(game); // Maintenant accepté grâce au nouveau type du contexte
+      toggleFavorite(game);
     }
   };
 
   return (
     <div
-      className="relative bg-white rounded-xl shadow-md overflow-hidden hover:shadow-2xl transition-all duration-300 flex flex-col h-full cursor-pointer transform hover:scale-[1.02]"
+      className="relative bg-white dark:bg-gray-800/90 rounded-xl shadow-md dark:shadow-xl overflow-hidden hover:shadow-2xl dark:hover:shadow-2xl transition-all duration-300 flex flex-col h-full cursor-pointer transform hover:scale-[1.02] backdrop-blur-sm border border-gray-200 dark:border-gray-700"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={onClick}
     >
-      <div className="relative h-64 bg-gray-100">
+      <div className="relative h-64 bg-gray-100 dark:bg-gray-700">
         <img
           src={game.image}
           alt={game.title}
@@ -66,10 +63,10 @@ export default function GameCard({
 
       <div className="p-4 flex flex-col flex-1 justify-between">
         <div>
-          <h3 className="font-bold text-lg text-gray-900 line-clamp-2 mb-2">
+          <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100 line-clamp-2 mb-2">
             {game.title}
           </h3>
-          <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+          <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-3">
             <span>
               {game.minPlayers}–{game.maxPlayers} joueurs
             </span>
@@ -83,18 +80,18 @@ export default function GameCard({
         </div>
 
         <div className="flex items-center justify-between mt-auto">
-          <span className="text-2xl font-bold text-indigo-600">
+          <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
             {game.price}€
           </span>
           <button
             onClick={handleHeartClick}
-            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
             <Heart
               className={`w-7 h-7 transition-all ${
                 isFavorite(game.id)
                   ? "fill-red-500 text-red-500 scale-110"
-                  : "text-gray-400 hover:text-red-500"
+                  : "text-gray-400 dark:text-gray-500 hover:text-red-500"
               }`}
             />
           </button>

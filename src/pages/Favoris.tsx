@@ -14,9 +14,7 @@ export default function Favoris() {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 100);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 100);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -75,11 +73,7 @@ export default function Favoris() {
         ]),
         startY: 50,
         theme: "grid",
-        headStyles: {
-          fillColor: [79, 70, 229],
-          textColor: 255,
-          fontStyle: "bold",
-        },
+        headStyles: { fillColor: [79, 70, 229], textColor: 255 },
         styles: { fontSize: 10, cellPadding: 8 },
         alternateRowStyles: { fillColor: [248, 250, 252] },
         columnStyles: {
@@ -106,11 +100,11 @@ export default function Favoris() {
   if (favorites.length === 0) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-20 text-center">
-        <Heart className="w-24 h-24 text-gray-300 mx-auto mb-6" />
-        <h2 className="text-3xl font-bold text-gray-700 mb-4">
+        <Heart className="w-24 h-24 text-gray-300 dark:text-gray-600 mx-auto mb-6" />
+        <h2 className="text-3xl font-bold text-gray-700 dark:text-gray-200 mb-4">
           Aucun favori pour le moment
         </h2>
-        <p className="text-xl text-gray-500">
+        <p className="text-xl text-gray-500 dark:text-gray-400">
           Ajoutez des jeux en cliquant sur le cœur
         </p>
       </div>
@@ -119,26 +113,22 @@ export default function Favoris() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">
-      {/* Titre */}
-      <h1 className="text-4xl font-bold text-center mb-8">
+      <h1 className="text-4xl font-bold text-center mb-8 text-gray-900 dark:text-white">
         Mes jeux favoris ({favorites.length})
       </h1>
 
-      {/* Barre d'actions */}
+      {/* Barre d’actions fixe */}
       <div
-        className={`flex flex-col sm:flex-row gap-4 justify-center items-center py-6 bg-white border-b border-gray-200 transition-all duration-300 ${
+        className={`flex flex-col sm:flex-row gap-4 justify-center items-center py-6 rounded-2xl border transition-all duration-300 ${
           isScrolled
-            ? "fixed top-0 left-0 right-0 z-40 shadow-lg border-t"
-            : "relative"
+            ? "fixed top-16 left-0 right-0 z-40 mx-4 shadow-2xl backdrop-blur-xl bg-white/90 dark:bg-gray-800/95 border-gray-200 dark:border-gray-700"
+            : "relative bg-white dark:bg-gray-800/90 border-gray-200 dark:border-gray-700"
         }`}
-        style={{ backdropFilter: isScrolled ? "blur(10px)" : "none" }}
       >
         <button
           onClick={exportToPDF}
           disabled={isExporting}
-          className={`flex items-center gap-3 px-8 py-4 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition shadow-lg font-medium text-lg ${
-            isExporting ? "opacity-75 cursor-wait" : ""
-          }`}
+          className="flex items-center gap-3 px-8 py-4 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-70 text-white rounded-xl shadow-lg font-medium text-lg transition"
         >
           {isExporting ? (
             <>
@@ -155,17 +145,15 @@ export default function Favoris() {
 
         <button
           onClick={() => setShowClearAllModal(true)}
-          className="flex items-center gap-3 px-8 py-4 bg-red-600 text-white rounded-xl hover:bg-red-700 transition shadow-lg font-medium text-lg"
+          className="flex items-center gap-3 px-8 py-4 bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-lg font-medium text-lg transition"
         >
           <Trash2 className="w-6 h-6" />
           Vider tous les favoris
         </button>
       </div>
 
-      {/* Espace pour compenser la barre fixe */}
-      <div className={isScrolled ? "pt-32" : ""} />
+      <div className={isScrolled ? "pt-36" : "pt-8"} />
 
-      {/* Grille des jeux */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-8">
         {favorites.map((game) => (
           <GameCard
@@ -177,7 +165,7 @@ export default function Favoris() {
         ))}
       </div>
 
-      {/* Modales (inchangées) */}
+      {/* Modales */}
       {gameToRemove !== null && (
         <>
           <div
@@ -185,18 +173,18 @@ export default function Favoris() {
             onClick={closeModal}
           />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 max-w-md w-full p-8">
               <div className="flex items-center gap-4 mb-6">
-                <div className="p-3 bg-red-100 rounded-full">
-                  <Trash2 className="w-8 h-8 text-red-600" />
+                <div className="p-3 bg-red-100 dark:bg-red-900/50 rounded-full">
+                  <Trash2 className="w-8 h-8 text-red-600 dark:text-red-400" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
                   Retirer des favoris ?
                 </h3>
               </div>
-              <p className="text-gray-600 mb-8">
+              <p className="text-gray-600 dark:text-gray-300 mb-8">
                 Êtes-vous sûr de vouloir retirer <br />
-                <span className="font-semibold text-indigo-600 text-lg">
+                <span className="font-semibold text-indigo-600 dark:text-indigo-400 text-lg">
                   {gameBeingRemoved?.title}
                 </span>{" "}
                 ?
@@ -204,13 +192,13 @@ export default function Favoris() {
               <div className="flex gap-4 justify-end">
                 <button
                   onClick={closeModal}
-                  className="px-6 py-3 bg-gray-100 rounded-lg hover:bg-gray-200"
+                  className="px-6 py-3 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition"
                 >
                   Annuler
                 </button>
                 <button
                   onClick={confirmRemove}
-                  className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+                  className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg flex items-center gap-2 transition"
                 >
                   <Trash2 className="w-5 h-5" /> Retirer
                 </button>
@@ -227,36 +215,35 @@ export default function Favoris() {
             onClick={() => setShowClearAllModal(false)}
           />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 max-w-md w-full p-8">
               <div className="flex items-center gap-4 mb-6">
-                <div className="p-3 bg-red-100 rounded-full">
-                  <Trash2 className="w-8 h-8 text-red-600" />
+                <div className="p-3 bg-red-100 dark:bg-red-900/50 rounded-full">
+                  <Trash2 className="w-8 h-8 text-red-600 dark:text-red-400" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
                   Vider tous les favoris ?
                 </h3>
               </div>
-              <p className="text-gray-600 mb-8">
+              <p className="text-gray-600 dark:text-gray-300 mb-8">
                 Êtes-vous <strong>sûr</strong> de vouloir retirer{" "}
-                <span className="text-red-600 font-bold">
+                <span className="text-red-600 dark:text-red-400 font-bold">
                   {favorites.length} jeu{favorites.length > 1 ? "x" : ""}
                 </span>{" "}
-                ?
-                <br />
-                <span className="text-sm text-gray-500">
+                ?<br />
+                <span className="text-sm text-gray-500 dark:text-gray-400">
                   Action irréversible.
                 </span>
               </p>
               <div className="flex gap-4 justify-end">
                 <button
                   onClick={() => setShowClearAllModal(false)}
-                  className="px-6 py-3 bg-gray-100 rounded-lg hover:bg-gray-200"
+                  className="px-6 py-3 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition"
                 >
                   Annuler
                 </button>
                 <button
                   onClick={confirmClearAll}
-                  className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+                  className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg flex items-center gap-2 transition"
                 >
                   <Trash2 className="w-5 h-5" /> Tout vider
                 </button>

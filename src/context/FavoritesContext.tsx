@@ -1,7 +1,6 @@
 import { createContext, useState, type ReactNode } from "react";
 import jeux from "../data/jeux.json";
 
-// Type partagé partout dans l’app
 export type Game = typeof jeux[0];
 
 export type FavoritesContextType = {
@@ -36,5 +35,4 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// On exporte aussi le contexte lui-même pour le hook
 export { FavoritesContext };

@@ -5,20 +5,16 @@
   <meta charset="utf-8">
   <title>CardBoard</title>
   <script>
-    const base = "/cardboard";
-    const path = location.pathname + location.search + location.hash;
+    const pathAfterBase = location.pathname.substring("/cardboard".length) || "/";
+    const search = location.search;
+    const hash = location.hash;
 
-    if (location.pathname.startsWith(base + "/") || location.pathname === base || location.pathname === base + "/") {
-      const url = base + "/index.html" + location.search + location.hash;
-      location.replace(location.origin + url);
-    } else {
-      location.replace(location.origin + base + "/" + location.pathname.replace(/^\//, "") + location.search + location.hash);
-    }
+    location.replace("/cardboard/index.html" + pathAfterBase + search + hash);
   </script>
 </head>
 
 <body>
-  <!-- Rien à afficher, on redirige immédiatement -->
+  Chargement…
 </body>
 
 </html>

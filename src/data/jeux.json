@@ -306,7 +306,7 @@
     "complexity": 2,
     "price": 45,
     "popularity": 94,
-    "image": "%BASE_URL%images/les_aventuriers_du_rail.png",
+    "image": "/images/les_aventuriers_du_rail.png",
     "categories": ["Parcours", "Collection"],
     "themes": ["Train", "Europe"],
     "tags": ["Familial"]

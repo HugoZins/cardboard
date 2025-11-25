@@ -5,20 +5,20 @@
   <meta charset="utf-8">
   <title>CardBoard</title>
   <script>
-    const requested = location.pathname + location.search + location.hash;
+    const base = "/cardboard";
+    const path = location.pathname + location.search + location.hash;
 
-    const correctPrefix = "/cardboard/";
-
-    if (requested.startsWith(correctPrefix)) {
-      location.replace(location.origin + correctPrefix + "index.html" + location.search + location.hash);
+    if (location.pathname.startsWith(base + "/") || location.pathname === base || location.pathname === base + "/") {
+      const url = base + "/index.html" + location.search + location.hash;
+      location.replace(location.origin + url);
     } else {
-      location.replace(location.origin + correctPrefix + requested.replace(/^\//, ""));
+      location.replace(location.origin + base + "/" + location.pathname.replace(/^\//, "") + location.search + location.hash);
     }
   </script>
 </head>
 
 <body>
-  Redirection…
+  <!-- Rien à afficher, on redirige immédiatement -->
 </body>
 
 </html>

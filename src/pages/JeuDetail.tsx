@@ -73,7 +73,11 @@ export default function JeuDetail() {
       <div className="grid md:grid-cols-2 gap-12">
         <div>
           <img
-            src={game.image}
+            src={
+              game.image.startsWith("http")
+                ? game.image
+                : import.meta.env.BASE_URL + game.image.replace(/^\//, "")
+            }
             alt={game.title}
             className="w-full rounded-xl shadow-2xl object-cover border border-gray-200 dark:border-gray-700"
             onError={(e) =>

@@ -5,16 +5,25 @@
   <meta charset="utf-8">
   <title>CardBoard</title>
   <script>
-    const pathAfterBase = location.pathname.substring("/cardboard".length) || "/";
-    const search = location.search;
-    const hash = location.hash;
+    if (location.pathname.includes("/index.html")) {
+      const cleanPath = location.pathname
+        .replace(/\/index\.html/g, "")
+        .replace(/\/+$/, "") || "/";
 
-    location.replace("/cardboard/index.html" + pathAfterBase + search + hash);
+      location.replace("/cardboard/index.html" + cleanPath + location.search + location.hash);
+    }
+    else if (location.pathname.startsWith("/cardboard")) {
+      const pathAfterBase = location.pathname.substring("/cardboard".length) || "/";
+      location.replace("/cardboard/index.html" + pathAfterBase + location.search + location.hash);
+    }
+    else {
+      location.replace("/cardboard/index.html" + location.pathname + location.search + location.hash);
+    }
   </script>
 </head>
 
 <body>
-  Chargement…
+  Redirection…
 </body>
 
 </html>

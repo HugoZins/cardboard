@@ -44,7 +44,7 @@ export default function GameCard({
     >
       <div className="relative h-64 bg-gray-100 dark:bg-gray-700">
         <img
-          src={game.image}
+          src={import.meta.env.BASE_URL + game.image.substring(1)}
           alt={game.title}
           loading="lazy"
           className="w-full h-full object-cover transition-transform duration-500"

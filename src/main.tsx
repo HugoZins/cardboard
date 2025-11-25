@@ -5,11 +5,9 @@ import App from "./App.tsx";
 import { FavoritesProvider } from "./context/FavoritesContext";
 import "./index.css";
 
-const basename = import.meta.env.BASE_URL;
-
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <HashRouter basename={basename}>
+    <HashRouter>
       <FavoritesProvider>
         <App />
       </FavoritesProvider>
